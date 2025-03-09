@@ -41,7 +41,6 @@ if (require.main === module) {
     }
   };
 
-  // Обработка сигналов завершения для корректного закрытия соединений
   process.on('SIGTERM', async () => {
     console.log('SIGTERM signal received');
     if (server) {
@@ -73,5 +72,4 @@ if (require.main === module) {
   startServer();
 }
 
-// Экспорт app для тестирования
 export default app; 

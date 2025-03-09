@@ -78,7 +78,7 @@ export const generateCombinations = async (numbers: number[], length: number): P
 };
 
 // Helper function to generate valid combinations
-// Экспортируем функцию для тестирования
+
 export const generateValidCombinations = (items: Item[], targetLength: number): Item[][] => {
   const result: Item[][] = [];
   

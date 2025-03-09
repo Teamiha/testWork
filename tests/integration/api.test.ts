@@ -3,17 +3,17 @@ import app from '../../src/index';
 import { initializeDatabase, closeDatabase } from '../../src/config/database';
 
 describe('API Endpoints', () => {
-  // Настройка перед запуском тестов
+  // Setup before running tests
   beforeAll(async () => {
-    // Инициализировать базу данных
+    // Initialize the database
     await initializeDatabase();
   });
 
-  // Закрытие соединений после всех тестов
+  // Closing connections after all tests
   afterAll(async () => {
-    // Закрываем соединения с базой данных
+    // Close database connections
     await closeDatabase();
-    // Добавляем небольшую задержку, чтобы убедиться, что все соединения закрыты
+    // Add a small delay to ensure all connections are closed
     await new Promise(resolve => setTimeout(resolve, 500));
   });
 
@@ -29,21 +29,21 @@ describe('API Endpoints', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      // Проверка структуры ответа
+      // Check response structure
       expect(response.body).toHaveProperty('id');
       expect(response.body).toHaveProperty('combination');
       expect(Array.isArray(response.body.combination)).toBe(true);
       
-      // Проверка, что комбинации имеют правильную длину
+      // Check that combinations have the correct length
       response.body.combination.forEach((combo: string[]) => {
         expect(combo.length).toBe(2);
       });
       
-      // Проверка, что в каждой комбинации нет элементов с одинаковым префиксом
+      // Check that there are no elements with the same prefix in each combination
       response.body.combination.forEach((combo: string[]) => {
-        const prefixes = combo.map(item => item[0]); // Получаем первую букву каждого элемента
+        const prefixes = combo.map(item => item[0]); // Get the first letter of each element
         const uniquePrefixes = new Set(prefixes);
-        expect(uniquePrefixes.size).toBe(combo.length); // Количество уникальных префиксов должно совпадать с длиной комбинации
+        expect(uniquePrefixes.size).toBe(combo.length); // The number of unique prefixes should match the length of the combination
       });
     });
 
@@ -86,7 +86,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  // Тест для endpoint /health
+  // Test for endpoint /health
   describe('GET /health', () => {
     it('should return status ok', async () => {
       const response = await request(app)

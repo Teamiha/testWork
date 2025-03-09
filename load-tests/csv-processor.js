@@ -1,21 +1,21 @@
-// Функция для обработки данных из CSV и преобразования их в JSON
+// Function for processing data from CSV and converting to JSON
 function processJsonData(userContext, events, done) {
   try {
-    // Получаем строковые значения из CSV
+    // Get string values from CSV
     const itemsStr = userContext.vars.items;
     const lengthStr = userContext.vars.length;
     
-    // Парсим строку JSON-массива в JavaScript-массив
+    // Parse JSON array string into JavaScript array
     const parsedItems = JSON.parse(itemsStr);
     
-    // Преобразуем строковое значение длины в число
+    // Convert string length value to number
     const parsedLength = parseInt(lengthStr, 10);
     
-    // Сохраняем обработанные значения в контексте
+    // Save processed values in context
     userContext.vars.parsedItems = parsedItems;
     userContext.vars.parsedLength = parsedLength;
     
-    // Для отладки
+    // For debugging
     // console.log(`Processed: items=${JSON.stringify(parsedItems)}, length=${parsedLength}`);
     
     return done();

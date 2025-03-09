@@ -1,7 +1,7 @@
 import { generateValidCombinations } from '../../src/services/combinationService';
 import { closeDatabase } from '../../src/config/database';
 
-// Создаем мок для базы данных
+// Create a mock for the database
 jest.mock('../../src/config/database', () => {
   const mockPool = {
     end: jest.fn().mockResolvedValue(undefined)
@@ -17,7 +17,7 @@ jest.mock('../../src/config/database', () => {
   };
 });
 
-// Создаем тестовые данные
+// Create test data
 interface Item {
   id: number;
   letter: string;
@@ -33,34 +33,34 @@ const testItems: Item[] = [
 ];
 
 describe('Combination Service', () => {
-  // Закрываем соединения после завершения всех тестов
+  // Close connections after all tests are completed
   afterAll(async () => {
     await closeDatabase();
   });
   
   describe('generateValidCombinations', () => {
     it('should generate valid combinations of specified length', () => {
-      // Генерируем комбинации длиной 2
+      // Generate combinations of length 2
       const combinations = generateValidCombinations(testItems, 2);
       
-      // Проверяем, что все комбинации имеют правильную длину
+      // Check that all combinations have the correct length
       combinations.forEach(combo => {
         expect(combo.length).toBe(2);
       });
       
-      // Проверяем, что в каждой комбинации нет элементов с одинаковым префиксом
+      // Check that there are no elements with the same prefix in each combination
       combinations.forEach(combo => {
         const letters = combo.map(item => item.letter);
         const uniqueLetters = new Set(letters);
         expect(uniqueLetters.size).toBe(combo.length);
       });
       
-      // Проверяем, что все возможные валидные комбинации сгенерированы
-      // Для тестовых данных [A1, B1, B2, C1] и длины 2 должны быть комбинации:
+      // Check that all possible valid combinations are generated
+      // For test data [A1, B1, B2, C1] and length 2, there should be combinations:
       // [A1, B1], [A1, B2], [A1, C1], [B1, C1], [B2, C1]
       expect(combinations.length).toBe(5);
       
-      // Проверяем наличие ожидаемых комбинаций
+      // Check for expected combinations
       const expectedCombos = [
         [testItems[0], testItems[1]], // [A1, B1]
         [testItems[0], testItems[2]], // [A1, B2]
@@ -69,7 +69,7 @@ describe('Combination Service', () => {
         [testItems[2], testItems[3]]  // [B2, C1]
       ];
       
-      // Проверяем что каждая ожидаемая комбинация присутствует в результате
+      // Check that each expected combination is present in the result
       expectedCombos.forEach(expectedCombo => {
         const found = combinations.some(combo => 
           combo.length === expectedCombo.length &&
@@ -80,13 +80,13 @@ describe('Combination Service', () => {
     });
     
     it('should return empty array for impossible combinations', () => {
-      // Создаем список элементов только с одинаковыми префиксами
+      // Create a list of items with only the same prefixes
       const sameLetterItems: Item[] = [
         { id: 1, letter: 'A', value: 1, code: 'A1' },
         { id: 2, letter: 'A', value: 2, code: 'A2' }
       ];
       
-      // Запрашиваем комбинации длиной 2, что невозможно с нашими правилами
+      // Request combinations of length 2, which is impossible with our rules
       const combinations = generateValidCombinations(sameLetterItems, 2);
       expect(combinations.length).toBe(0);
     });
@@ -94,10 +94,10 @@ describe('Combination Service', () => {
     it('should generate combinations of length 1 correctly', () => {
       const combinations = generateValidCombinations(testItems, 1);
       
-      // Для каждого элемента должна быть своя комбинация
+      // There should be a combination for each item
       expect(combinations.length).toBe(testItems.length);
       
-      // Проверяем, что все элементы присутствуют
+      // Check that all items are present
       testItems.forEach(item => {
         const found = combinations.some(combo => 
           combo.length === 1 && combo[0].id === item.id

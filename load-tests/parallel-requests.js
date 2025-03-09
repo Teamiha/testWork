@@ -2,13 +2,13 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-// Загрузить тестовые данные из CSV
+// Load test data from CSV
 const csvData = fs.readFileSync(path.join(__dirname, 'test-data.csv'), 'utf8');
-const rows = csvData.trim().split('\n').slice(1); // Пропускаем заголовок
+const rows = csvData.trim().split('\n').slice(1); // Skip header
 
-// Обрабатываем данные из CSV, учитывая кавычки
+// Process data from CSV, considering quotes
 const testData = rows.map(row => {
-  // Используем регулярное выражение для корректного разбора CSV с кавычками
+  // Use regular expression for correct parsing of CSV with quotes
   const match = row.match(/"(\[.*?\])"\s*,\s*(\d+)/);
   
   if (match) {
@@ -21,11 +21,11 @@ const testData = rows.map(row => {
     console.error('Failed to parse row:', row);
     return null;
   }
-}).filter(Boolean); // Удаляем null значения
+}).filter(Boolean); // Remove null values
 
 console.log(`Loaded ${testData.length} test cases from CSV`);
 
-// Функция для отправки одного запроса
+// Function to send a single request
 function sendRequest(data) {
   return new Promise((resolve, reject) => {
     const requestData = JSON.stringify(data);
@@ -69,9 +69,9 @@ function sendRequest(data) {
   });
 }
 
-// Основная функция для запуска параллельных запросов
+// Main function to run parallel requests
 async function runParallelLoad(concurrentRequests, totalRequests) {
-  console.log(`Запуск ${totalRequests} запросов с параллелизмом ${concurrentRequests}`);
+  console.log(`Starting ${totalRequests} requests with parallelism ${concurrentRequests}`);
   
   const results = {
     totalRequests,
@@ -87,13 +87,13 @@ async function runParallelLoad(concurrentRequests, totalRequests) {
   const startTime = Date.now();
   let completed = 0;
   
-  // Функция для запуска батча запросов
+  // Function to run a batch of requests
   async function runBatch() {
     const batch = [];
     const batchSize = Math.min(concurrentRequests, totalRequests - completed);
     
     for (let i = 0; i < batchSize; i++) {
-      // Случайный выбор тестовых данных
+      // Random selection of test data
       const testCase = testData[Math.floor(Math.random() * testData.length)];
       batch.push(sendRequest(testCase));
     }
@@ -118,15 +118,15 @@ async function runParallelLoad(concurrentRequests, totalRequests) {
       
       completed += batchSize;
       
-      // Прогресс
+      // Progress
       const progress = Math.floor((completed / totalRequests) * 100);
-      process.stdout.write(`\rПрогресс: ${progress}% (${completed}/${totalRequests})`);
+      process.stdout.write(`\rProgress: ${progress}% (${completed}/${totalRequests})`);
       
       if (completed < totalRequests) {
         await runBatch();
       }
     } catch (error) {
-      console.error('Ошибка при выполнении батча запросов:', error);
+      console.error('Error executing batch of requests:', error);
       results.failedRequests += batchSize;
       completed += batchSize;
       
@@ -141,51 +141,51 @@ async function runParallelLoad(concurrentRequests, totalRequests) {
   const endTime = Date.now();
   const totalElapsedTime = endTime - startTime;
   
-  // Сортировка длительностей для расчета процентилей
+  // Sort durations for percentile calculation
   results.durations.sort((a, b) => a - b);
   
-  // Вычисление процентилей
+  // Calculate percentiles
   results.averageDuration = results.totalDuration / results.durations.length;
   results.medianDuration = results.durations[Math.floor(results.durations.length / 2)];
   results.p90 = results.durations[Math.floor(results.durations.length * 0.9)];
   results.p95 = results.durations[Math.floor(results.durations.length * 0.95)];
   results.p99 = results.durations[Math.floor(results.durations.length * 0.99)];
   
-  // Расчет RPS (запросов в секунду)
+  // Calculate RPS (requests per second)
   results.requestsPerSecond = completed / (totalElapsedTime / 1000);
   
-  console.log('\n\nРезультаты нагрузочного тестирования:');
+  console.log('\n\nLoad testing results:');
   console.log('========================================');
-  console.log(`Всего запросов: ${totalRequests}`);
-  console.log(`Успешных запросов: ${results.successfulRequests}`);
-  console.log(`Неудачных запросов: ${results.failedRequests}`);
-  console.log(`Общее время: ${totalElapsedTime}ms`);
-  console.log(`Запросов в секунду: ${results.requestsPerSecond.toFixed(2)}`);
-  console.log('\nВремя обработки запросов:');
-  console.log(`Минимум: ${results.minDuration}ms`);
-  console.log(`Среднее: ${results.averageDuration.toFixed(2)}ms`);
-  console.log(`Медиана: ${results.medianDuration}ms`);
+  console.log(`Total requests: ${totalRequests}`);
+  console.log(`Successful requests: ${results.successfulRequests}`);
+  console.log(`Failed requests: ${results.failedRequests}`);
+  console.log(`Total time: ${totalElapsedTime}ms`);
+  console.log(`Requests per second: ${results.requestsPerSecond.toFixed(2)}`);
+  console.log('\nRequest processing time:');
+  console.log(`Minimum: ${results.minDuration}ms`);
+  console.log(`Average: ${results.averageDuration.toFixed(2)}ms`);
+  console.log(`Median: ${results.medianDuration}ms`);
   console.log(`p90: ${results.p90}ms`);
   console.log(`p95: ${results.p95}ms`);
   console.log(`p99: ${results.p99}ms`);
-  console.log(`Максимум: ${results.maxDuration}ms`);
+  console.log(`Maximum: ${results.maxDuration}ms`);
   
-  console.log('\nКоды статуса:');
+  console.log('\nStatus codes:');
   Object.keys(results.statusCodes).forEach(code => {
     console.log(`${code}: ${results.statusCodes[code]}`);
   });
   
-  // Сохранение результатов в файл
+  // Save results to file
   fs.writeFileSync(
     path.join(__dirname, `parallel-results-${Date.now()}.json`),
     JSON.stringify(results, null, 2)
   );
-  console.log('\nРезультаты сохранены в файл JSON');
+  console.log('\nResults saved to JSON file');
 }
 
-// Запуск теста с 50 параллельными запросами, всего 1000 запросов
+// Run test with 50 parallel requests, 1000 total requests
 const concurrentRequests = process.argv[2] ? parseInt(process.argv[2]) : 50;
 const totalRequests = process.argv[3] ? parseInt(process.argv[3]) : 1000;
 
 runParallelLoad(concurrentRequests, totalRequests)
-  .catch(err => console.error('Ошибка при выполнении тестирования:', err)); 
+  .catch(err => console.error('Error during test execution:', err)); 
