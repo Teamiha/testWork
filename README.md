@@ -143,12 +143,32 @@ The project includes both unit and integration tests using Jest:
 # Run all tests
 npm test
 
+# Run tests with resource leak detection
+npm run test:debug
+
 # Run tests in watch mode (updates when files change)
 npm run test:watch
 
 # Run tests with coverage report
 npm run test:coverage
 ```
+
+#### Resource Leak Detection
+
+The `test:debug` command runs tests with the `--detectOpenHandles` flag, which helps identify resource leaks in your tests, such as:
+
+- Unclosed database connections
+- Open file handles
+- Running timers or intervals
+- Unresolved promises
+
+Use this command when you encounter warnings like:
+```
+A worker process has failed to exit gracefully and has been force exited. 
+This is likely caused by tests leaking due to improper teardown.
+```
+
+This is particularly useful for debugging issues with database connections or other resources that might not be properly closed after test execution.
 
 The test suite includes:
 - Unit tests for the combination generation algorithm
