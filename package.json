@@ -7,6 +7,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
+    "build:prod": "tsc && npm prune --production",
     "setup-db": "node setup-db.js",
     "test-api": "node test-api.js",
     "test": "jest",
@@ -15,7 +16,8 @@
     "test:coverage": "jest --coverage",
     "load:artillery": "artillery run load-tests/generate-combinations.yml",
     "load:autocannon": "node load-tests/autocannon-test.js",
-    "load:parallel": "node load-tests/parallel-requests.js"
+    "load:parallel": "node load-tests/parallel-requests.js",
+    "clean": "node clean.js"
   },
   "keywords": [],
   "author": "",

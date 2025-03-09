@@ -1,6 +1,4 @@
-# Backend Task - Skillex
-
-This is a Node.js and TypeScript implementation of the backend task for Skillex. The API generates combinations from a list of items, where items starting with the same letter cannot be combined, and stores them in a MySQL database.
+# Mikhail Svetlov - Backend Task 
 
 ## Problem Description
 
@@ -72,6 +70,18 @@ For development mode with hot-reloading:
 ```
 npm run dev
 ```
+
+### Production Setup
+
+For production deployment, use:
+```bash
+# Build and prune dev dependencies
+npm run build:prod
+
+# Total project size can be reduced from ~500MB to ~10MB
+```
+
+This command builds the project and removes development dependencies, significantly reducing the deployment size.
 
 ## Database Schema
 
@@ -277,4 +287,4 @@ Use these metrics to identify bottlenecks and optimize your API for production e
 - Transactions are used to ensure data consistency when storing combinations
 - The combination generation algorithm uses a backtracking approach
 - Input validation is implemented to ensure proper request formatting
-- The API respects the rule where items starting with the same letter cannot be combined 
+- The API respects the rule where items starting with the same letter cannot be combined
