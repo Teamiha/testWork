@@ -179,18 +179,39 @@ The test suite includes:
 
 The project includes several tools for load testing the API to simulate high traffic and evaluate performance:
 
+#### Prerequisites
+
+Before running load tests, make sure:
+1. Your MySQL server is running
+2. Your API server is built and running:
+   ```bash
+   npm run build
+   npm start
+   ```
+3. The database is initialized:
+   ```bash
+   npm run setup-db
+   ```
+
+#### Running Load Tests
+
+You can run load tests using three different approaches:
+
 ```bash
-# Using Artillery - comprehensive load testing
+# Using Artillery - comprehensive load testing (high load)
+# Tests with ramp-up (5-50 RPS) for 60s and constant load (50 RPS) for 120s
 npm run load:artillery
 
-# Using Autocannon - lightweight benchmarking
+# Using Autocannon - lightweight benchmarking (medium load)
+# Tests with 100 concurrent connections for 30s
 npm run load:autocannon
 
-# Using custom parallel requests script
+# Using custom parallel requests script (configurable load)
+# Default: 50 concurrent requests, 1000 total requests
 npm run load:parallel
 
-# Run custom parallel script with specific concurrency and total requests
-node load-tests/parallel-requests.js 100 5000
+# You can also customize concurrency and total requests:
+node load-tests/parallel-requests.js 100 5000  # 100 concurrent, 5000 total
 ```
 
 #### Load Testing Tools
@@ -199,25 +220,55 @@ node load-tests/parallel-requests.js 100 5000
    - Supports various load profiles (ramp-up, steady, etc.)
    - Detailed reporting and visualization
    - Uses test data from CSV files
+   - Configuration in `load-tests/generate-combinations.yml`
 
 2. **Autocannon** - Lightweight, fast Node.js benchmarking tool
    - Minimal overhead
    - Real-time statistics
    - Simple configuration
+   - Implementation in `load-tests/autocannon-test.js`
 
 3. **Custom Parallel Script** - Customizable testing with Promise.all
    - Fine-grained control over request patterns
    - Detailed metrics and percentiles
    - Easily adaptable for specific scenarios
+   - Implementation in `load-tests/parallel-requests.js`
+
+#### Test Data
+
+All load tests use the same set of test data from `load-tests/test-data.csv`, which contains various combinations of input arrays and lengths. You can modify this file to test different scenarios.
 
 #### Analyzing Results
 
 The load testing tools provide various metrics to evaluate performance:
 
 - **Throughput**: Requests per second (RPS)
+  - Artillery: Check "http.request_rate" in summary
+  - Autocannon: Check "Req/Sec" values
+  - Custom script: Check "Запросов в секунду" value
+
 - **Latency**: Response time percentiles (p50, p90, p99)
+  - These percentiles help understand the distribution of response times
+  - p50 (median): 50% of requests are faster than this value
+  - p99: 99% of requests are faster than this value (important for SLAs)
+
 - **Error rate**: Percentage of failed requests
-- **Resource usage**: CPU and memory consumption during high load
+  - All tools report error counts and rates
+
+- **Resource usage**: Monitor CPU and memory during tests using system tools:
+  ```bash
+  # macOS/Linux
+  top -l 1 | head -15
+  ```
+
+#### Interpreting Results
+
+Good performance indicators for this API:
+- Throughput: 1000+ requests per second
+- p95 latency: Under 100ms
+- Error rate: 0%
+
+If the results don't meet these criteria, check the database connections, query optimization, and algorithmic efficiency of the combination generation.
 
 Use these metrics to identify bottlenecks and optimize your API for production environments.
 
