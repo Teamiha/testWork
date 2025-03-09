@@ -175,6 +175,52 @@ The test suite includes:
 - Integration tests for the API endpoints
 - Test cases for valid and invalid inputs
 
+### Load Testing
+
+The project includes several tools for load testing the API to simulate high traffic and evaluate performance:
+
+```bash
+# Using Artillery - comprehensive load testing
+npm run load:artillery
+
+# Using Autocannon - lightweight benchmarking
+npm run load:autocannon
+
+# Using custom parallel requests script
+npm run load:parallel
+
+# Run custom parallel script with specific concurrency and total requests
+node load-tests/parallel-requests.js 100 5000
+```
+
+#### Load Testing Tools
+
+1. **Artillery** - Comprehensive load testing tool with complex scenarios and metrics
+   - Supports various load profiles (ramp-up, steady, etc.)
+   - Detailed reporting and visualization
+   - Uses test data from CSV files
+
+2. **Autocannon** - Lightweight, fast Node.js benchmarking tool
+   - Minimal overhead
+   - Real-time statistics
+   - Simple configuration
+
+3. **Custom Parallel Script** - Customizable testing with Promise.all
+   - Fine-grained control over request patterns
+   - Detailed metrics and percentiles
+   - Easily adaptable for specific scenarios
+
+#### Analyzing Results
+
+The load testing tools provide various metrics to evaluate performance:
+
+- **Throughput**: Requests per second (RPS)
+- **Latency**: Response time percentiles (p50, p90, p99)
+- **Error rate**: Percentage of failed requests
+- **Resource usage**: CPU and memory consumption during high load
+
+Use these metrics to identify bottlenecks and optimize your API for production environments.
+
 ## Implementation Notes
 
 - Transactions are used to ensure data consistency when storing combinations

@@ -1,0 +1,50 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 50
+      name: "Разогрев и нарастающая нагрузка"
+    - duration: 120
+      arrivalRate: 50
+      name: "Постоянная высокая нагрузка"
+  payload:
+    path: "/Users/jegnum/Programming/Projects/mikhail_test_work/load-tests/test-data.csv"
+    fields:
+      - "items"
+      - "length"
+    order: sequence
+    skipHeader: true
+  processor: "/Users/jegnum/Programming/Projects/mikhail_test_work/load-tests/csv-processor.js"
+  ensure:
+    p95: 200  # 95% запросов должны завершаться быстрее 200мс
+    maxErrorRate: 1  # максимальный процент ошибок - 1%
+
+scenarios:
+  - name: "Генерация комбинаций"
+    weight: 7
+    flow:
+      - function: "processJsonData"
+      - post:
+          url: "/generate"
+          json:
+            items: "{{ parsedItems }}"
+            length: "{{ parsedLength }}"
+          expect:
+            - statusCode: 200
+            - contentType: json
+          capture:
+            - json: "$.id"
+              as: "responseId"
+            
+  - name: "Проверка состояния API"
+    weight: 3
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - equals:
+                - "$.status"
+                - "ok" 
