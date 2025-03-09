@@ -18,16 +18,47 @@ For example, given an input array like `[1, 2, 1]`, which corresponds to items `
 
 ## Setup
 
+### Prerequisites
+1. Install Node.js v14 or higher
+2. Install MySQL 5.7 or higher:
+   - **macOS**: `brew install mysql` or download from mysql.com
+   - **Windows**: Download MySQL installer from mysql.com
+   - **Linux**: `sudo apt install mysql-server` (Ubuntu/Debian)
+   
+3. Start MySQL server:
+   - **macOS**: `brew services start mysql`
+   - **Windows**: Via Services panel or command `net start mysql`
+   - **Linux**: `sudo systemctl start mysql`
+   
+4. Create a database for the project:
+   ```sql
+   mysql -u root -p
+   CREATE DATABASE skillex_db;
+   # Optionally create a dedicated user:
+   CREATE USER 'skillex_user'@'localhost' IDENTIFIED BY 'your_password';
+   GRANT ALL PRIVILEGES ON skillex_db.* TO 'skillex_user'@'localhost';
+   FLUSH PRIVILEGES;
+   EXIT;
+   ```
+
+### Project Setup
 1. Clone the repository
 2. Install dependencies:
-```
-npm install
-```
-3. Configure your MySQL database by editing the `.env` file
-4. Set up the database:
-```
-npm run setup-db
-```
+   ```
+   npm install
+   ```
+3. Configure your MySQL database by editing the `.env` file:
+   ```
+   PORT=3000
+   DB_HOST=localhost
+   DB_USER=root  # or your dedicated user
+   DB_PASSWORD=your_password
+   DB_NAME=skillex_db
+   ```
+4. Initialize the database schema:
+   ```
+   npm run setup-db
+   ```
 5. Build the TypeScript code:
 ```
 npm run build
