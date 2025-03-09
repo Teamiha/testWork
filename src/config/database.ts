@@ -16,8 +16,9 @@ const pool = mysql.createPool({
 
 // Initialize the database schema
 export const initializeDatabase = async (): Promise<void> => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     
     // Create the items table
     await connection.query(`
@@ -62,10 +63,25 @@ export const initializeDatabase = async (): Promise<void> => {
       `);
     }
 
-    connection.release();
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
+    throw error;
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+};
+
+// Close database connections
+export const closeDatabase = async (): Promise<void> => {
+  try {
+    // Завершаем пул соединений
+    await pool.end();
+    console.log('Database connection pool closed');
+  } catch (error) {
+    console.error('Error closing database connection pool:', error);
     throw error;
   }
 };

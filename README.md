@@ -124,7 +124,9 @@ Response:
 }
 ```
 
-## Testing the API
+## Testing
+
+### Manual Testing
 
 You can test the API using the provided test script:
 ```
@@ -132,6 +134,26 @@ npm run test-api
 ```
 
 This will send a test request to the API and display the response.
+
+### Automated Testing
+
+The project includes both unit and integration tests using Jest:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode (updates when files change)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+The test suite includes:
+- Unit tests for the combination generation algorithm
+- Integration tests for the API endpoints
+- Test cases for valid and invalid inputs
 
 ## Implementation Notes
 
